@@ -1,9 +1,9 @@
 package com.inhyuk.lango.chat.application
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.inhyuk.lango.chat.domain.ChatMessage
 import com.inhyuk.lango.chat.domain.ChatSession
 import com.inhyuk.lango.chat.domain.MessageSender
+import com.inhyuk.lango.chat.dto.ChatMessageResponse
 import com.inhyuk.lango.chat.dto.ChatSessionResponse
 import com.inhyuk.lango.chat.dto.ScenarioGenerationResponse
 import com.inhyuk.lango.chat.infrastructure.ChatMessageRepository
@@ -13,10 +13,7 @@ import com.inhyuk.lango.user.infrastructure.UserRepository
 import dev.langchain4j.data.message.AiMessage
 import dev.langchain4j.data.message.SystemMessage
 import dev.langchain4j.data.message.UserMessage
-import dev.langchain4j.model.output.Response
-import dev.langchain4j.model.StreamingResponseHandler
 import dev.langchain4j.model.chat.ChatModel
-import dev.langchain4j.model.chat.StreamingChatModel
 import dev.langchain4j.model.chat.request.ChatRequest
 import dev.langchain4j.model.chat.request.ResponseFormat
 import dev.langchain4j.model.chat.request.ResponseFormatType
@@ -24,7 +21,7 @@ import dev.langchain4j.model.chat.request.json.JsonObjectSchema
 import dev.langchain4j.model.chat.request.json.JsonSchema
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import org.springframework.web.servlet.mvc.method.annotation.SseEmitter
+import tools.jackson.databind.ObjectMapper
 
 @Service
 class ChatService(
@@ -33,7 +30,7 @@ class ChatService(
     private val chatMessageRepository: ChatMessageRepository,
     private val promptManager: PromptManager,
     private val chatModel: ChatModel,
-    private val streamingChatModel: StreamingChatModel,
+    private val objectMapper: ObjectMapper,
 ) {
 
     @Transactional
@@ -61,7 +58,7 @@ class ChatService(
             .responseFormat(responseFormat)
             .build()
         val response = chatModel.chat(request)
-        val scenarioData = ObjectMapper().readValue(response.aiMessage().text(), ScenarioGenerationResponse::class.java)
+        val scenarioData = objectMapper.readValue(response.aiMessage().text(), ScenarioGenerationResponse::class.java)
 
         val session = chatSessionRepository.save(ChatSession(
             user = user,
@@ -76,7 +73,7 @@ class ChatService(
     }
 
     @Transactional
-    fun startSessionChat(sessionId: Long): ChatSessionResponse {
+    fun startSessionChat(sessionId: Long): ChatMessageResponse {
         val session = chatSessionRepository.findById(sessionId)
             .orElseThrow { IllegalArgumentException("Session not found") }
 
@@ -90,11 +87,16 @@ class ChatService(
             .messages(SystemMessage(prompt))
             .build()
 
-        return ChatSessionResponse.from(session)
+        val response = chatModel.chat(request)
+
+        val text = response.aiMessage().text()
+        saveMessage(session, text, MessageSender.AI)
+
+        return ChatMessageResponse(text)
     }
 
     @Transactional
-    fun chatMessage(sessionId: Long, userMessageContent: String) {
+    fun chatMessage(sessionId: Long, userMessageContent: String) : ChatMessageResponse{
         val session = chatSessionRepository.findById(sessionId)
             .orElseThrow { IllegalArgumentException("Session not found") }
             
@@ -106,7 +108,7 @@ class ChatService(
         val lcMessages = mutableListOf<dev.langchain4j.data.message.ChatMessage>()
         
         // Add System Prompt
-        lcMessages.add(SystemMessage(promptManager.getChatSystemPrompt(session.aiRole, session.userLevel, session.scenario)))
+        lcMessages.add(SystemMessage(promptManager.getChatSystemPrompt(session.aiRole, session.userLevel, session.userLevel, session.scenario)))
         
         // Add History
         history.forEach { msg ->
@@ -117,41 +119,10 @@ class ChatService(
             }
         }
         
-        // Call Streaming Model
-        val sb = StringBuilder()
-        streamingChatModel.generate(lcMessages, object : StreamingResponseHandler<AiMessage> {
-            override fun onNext(token: String) {
-                try {
-                    emitter.send(token)
-                    sb.append(token)
-                } catch (e: Exception) {
-                    emitter.completeWithError(e)
-                }
-            }
-
-            override fun onComplete(response: Response<AiMessage>) {
-                try {
-                    // Save AI Response
-                     // Note: Internal logic of saveMessage needs to be handled carefully in async/transactional context
-                     // Ideally, we should delegate this to a transactional method or repository directly.
-                     // For simplicity in MVP, we might call repository directly here or use a self-injected service method.
-                     // But strictly speaking, transaction boundaries might be tricky inside callback.
-                     // However, JPA save is usually fine if session is active or we open a new one.
-                     // Given this is a callback, it runs on a different thread usually.
-                     // We will modify saveMessage to NOT rely on class-level transaction for the callback part, 
-                     // or assume specific thread context.
-                    // Actually, let's just use the repository here. The repository itself is thread-safe.
-                    createAndSaveMessage(session, sb.toString(), MessageSender.AI)
-                    emitter.complete()
-                } catch (e: Exception) {
-                    emitter.completeWithError(e)
-                }
-            }
-
-            override fun onError(error: Throwable) {
-                emitter.completeWithError(error)
-            }
-        })
+        val response = chatModel.chat(lcMessages)
+        val text = response.aiMessage().text()
+        saveMessage(session, text, MessageSender.AI)
+        return ChatMessageResponse(text)
     }
     
     // Extracted helper

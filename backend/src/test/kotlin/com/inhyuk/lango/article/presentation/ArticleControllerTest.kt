@@ -1,6 +1,5 @@
 package com.inhyuk.lango.article.presentation
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.inhyuk.lango.article.application.ArticleService
 import com.inhyuk.lango.article.dto.ArticleGenerationRequest
 import com.inhyuk.lango.article.dto.ArticleResponse
@@ -11,12 +10,13 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import tools.jackson.databind.ObjectMapper
 
 class ArticleControllerTest : BehaviorSpec({
     val articleService = mockk<ArticleService>()
     val articleController = ArticleController(articleService)
     val mockMvc = MockMvcBuilders.standaloneSetup(articleController).build()
-    val objectMapper = jacksonObjectMapper()
+    val objectMapper = ObjectMapper()
 
     given("An article generation request") {
         val request = ArticleGenerationRequest("AI")

@@ -1,20 +1,20 @@
 package com.inhyuk.lango.level.application
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.inhyuk.lango.level.dto.AssessmentResponse
 import com.inhyuk.lango.llm.prompt.PromptManager
 import com.inhyuk.lango.user.domain.User
 import com.inhyuk.lango.user.infrastructure.UserRepository
-import dev.langchain4j.model.chat.ChatLanguageModel
+import dev.langchain4j.model.chat.ChatModel
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import tools.jackson.databind.ObjectMapper
 
 class LevelServiceTest : BehaviorSpec({
     val userRepository = mockk<UserRepository>()
     val promptManager = mockk<PromptManager>()
-    val chatModel = mockk<ChatLanguageModel>()
+    val chatModel = mockk<ChatModel>()
     val objectMapper = mockk<ObjectMapper>()
     
     val levelService = LevelService(userRepository, promptManager, chatModel, objectMapper)
@@ -26,7 +26,7 @@ class LevelServiceTest : BehaviorSpec({
         `when`("assessing user answers") {
             every { userRepository.findByEmail(email) } returns user
             every { promptManager.getLevelAssessmentPrompt("My answers") } returns "prompt"
-            every { chatModel.generate("prompt") } returns "{}"
+            every { chatModel.chat("prompt") } returns "{}"
             
             val assessmentResponse = AssessmentResponse("Advanced", "Good vocabs")
             every { objectMapper.readValue("{}", AssessmentResponse::class.java) } returns assessmentResponse

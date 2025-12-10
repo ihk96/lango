@@ -1,7 +1,9 @@
 package com.inhyuk.lango.chat.presentation
 
 import com.inhyuk.lango.chat.application.FeedbackService
+import com.inhyuk.lango.chat.dto.ChatMessageResponse
 import com.inhyuk.lango.common.dto.ApiResponse
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -17,12 +19,12 @@ class LearningSupportController(
 ) {
 
     @PostMapping("/feedback")
-    fun getFeedback(@RequestBody request: FeedbackRequest): ApiResponse<String> {
-        return ApiResponse.success(feedbackService.getFeedback(request.message, request.context))
+    fun getFeedback(@RequestBody request: FeedbackRequest): ResponseEntity<ApiResponse<ChatMessageResponse>> {
+        return ResponseEntity.ok(ApiResponse(feedbackService.getFeedback(request.message, request.context)))
     }
 
     @PostMapping("/translate")
-    fun translate(@RequestBody request: TranslationRequest): ApiResponse<String> {
-        return ApiResponse.success(feedbackService.translate(request.text))
+    fun translate(@RequestBody request: TranslationRequest): ResponseEntity<ApiResponse<ChatMessageResponse>> {
+        return ResponseEntity.ok(ApiResponse(feedbackService.translate(request.text)))
     }
 }

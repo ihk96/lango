@@ -1,12 +1,10 @@
 package com.inhyuk.lango.chat.presentation
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.inhyuk.lango.chat.application.ChatService
 import com.inhyuk.lango.chat.dto.ChatSessionResponse
 import io.kotest.core.spec.style.BehaviorSpec
 import io.mockk.every
 import io.mockk.mockk
-import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -18,8 +16,8 @@ class ChatControllerTest : BehaviorSpec({
 
     given("A session start request") {
         `when`("service returns session") {
-            every { chatService.startSession(any(), any()) } returns 
-                ChatSessionResponse(1L, "Scenario", "User", "AI", "Hi")
+            every { chatService.createSession(any(), any()) } returns
+                ChatSessionResponse(1L, "Scenario", "User", "AI")
 
             then("it should return 200 OK") {
                 // Principal mocking is required for standard flows, but standalone setup bypasses security filters unless configured.

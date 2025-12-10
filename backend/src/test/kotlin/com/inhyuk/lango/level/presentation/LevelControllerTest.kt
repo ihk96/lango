@@ -1,6 +1,5 @@
 package com.inhyuk.lango.level.presentation
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.inhyuk.lango.level.application.LevelService
 import com.inhyuk.lango.level.dto.AssessmentRequest
 import com.inhyuk.lango.level.dto.AssessmentResponse
@@ -11,12 +10,13 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import tools.jackson.databind.ObjectMapper
 
 class LevelControllerTest : BehaviorSpec({
     val levelService = mockk<LevelService>()
     val levelController = LevelController(levelService)
     val mockMvc = MockMvcBuilders.standaloneSetup(levelController).build()
-    val objectMapper = jacksonObjectMapper()
+    val objectMapper = ObjectMapper()
 
     given("An assessment request") {
         val request = AssessmentRequest("Answers")

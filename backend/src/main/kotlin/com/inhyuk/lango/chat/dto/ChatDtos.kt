@@ -29,3 +29,7 @@ data class ChatSessionResponse(
 data class ChatMessageRequest(
     val content: String
 )
+
+data class ChatMessageResponse(
+    val content: String
+)

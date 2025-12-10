@@ -5,6 +5,7 @@ import com.inhyuk.lango.level.application.LevelService
 import com.inhyuk.lango.level.dto.AssessmentRequest
 import com.inhyuk.lango.level.dto.AssessmentResponse
 import com.inhyuk.lango.level.dto.QuestionResponse
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.security.Principal
 
@@ -15,15 +16,15 @@ class LevelController(
 ) {
 
     @GetMapping("/initial-questions")
-    fun getInitialQuestions(): ApiResponse<List<QuestionResponse>> {
-        return ApiResponse.success(levelService.getInitialQuestions())
+    fun getInitialQuestions(): ResponseEntity<ApiResponse<List<QuestionResponse>>> {
+        return ResponseEntity.ok(ApiResponse(levelService.getInitialQuestions()))
     }
 
     @PostMapping("/assess-initial")
     fun assessInitialLevel(
         @RequestBody request: AssessmentRequest,
         principal: Principal
-    ): ApiResponse<AssessmentResponse> {
-        return ApiResponse.success(levelService.assessInitialLevel(principal.name, request.answers))
+    ): ResponseEntity<ApiResponse<AssessmentResponse>> {
+        return ResponseEntity.ok(ApiResponse(levelService.assessInitialLevel(principal.name, request.answers)))
     }
 }

@@ -7,6 +7,7 @@ import com.inhyuk.lango.user.dto.SignupRequest
 import com.inhyuk.lango.user.dto.UserResponse
 import jakarta.servlet.http.HttpSession
 import jakarta.validation.Valid
+import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -18,18 +19,18 @@ class UserController(
     private val authService: AuthService
 ) {
     @PostMapping("/signup")
-    fun signup(@RequestBody @Valid request: SignupRequest): ApiResponse<UserResponse> {
-        return ApiResponse.success(authService.signup(request))
+    fun signup(@RequestBody @Valid request: SignupRequest): ResponseEntity<ApiResponse<UserResponse>> {
+        return ResponseEntity.ok(ApiResponse(authService.signup(request)))
     }
     
     @PostMapping("/login")
-    fun login(@RequestBody @Valid request: LoginRequest, session: HttpSession): ApiResponse<UserResponse> {
-        return ApiResponse.success(authService.login(request, session))
+    fun login(@RequestBody @Valid request: LoginRequest, session: HttpSession): ResponseEntity<ApiResponse<UserResponse>> {
+        return ResponseEntity.ok(ApiResponse(authService.login(request, session)))
     }
     
     @PostMapping("/logout")
-    fun logout(session: HttpSession): ApiResponse<Unit> {
+    fun logout(session: HttpSession): ResponseEntity<ApiResponse<Unit>> {
         session.invalidate()
-        return ApiResponse.success()
+        return ResponseEntity.ok(ApiResponse(null,"success"))
     }
 }

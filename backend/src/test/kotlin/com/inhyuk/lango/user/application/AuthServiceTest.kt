@@ -1,5 +1,6 @@
 package com.inhyuk.lango.user.application
 
+import com.inhyuk.lango.chat.domain.ChatSession
 import com.inhyuk.lango.user.domain.User
 import com.inhyuk.lango.user.dto.LoginRequest
 import com.inhyuk.lango.user.dto.SignupRequest
@@ -9,9 +10,11 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.spyk
 import io.mockk.verify
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.mock.web.MockHttpSession
+import java.util.UUID
 
 class AuthServiceTest : BehaviorSpec({
     val userRepository = mockk<UserRepository>()
@@ -20,9 +23,11 @@ class AuthServiceTest : BehaviorSpec({
 
     given("A signup request") {
         val request = SignupRequest("test@example.com", "password", "testuser")
+        val user = User("test@example.com", "encodedPw", "testuser")
+        val userId = UUID.randomUUID().toString()
 
         `when`("email is already registered") {
-            every { userRepository.findByEmail(any()) } returns User("test@example.com", "encodedPw", "oldUser")
+            every { userRepository.findByEmail(any()) } returns user
 
             then("it should throw IllegalArgumentException") {
                 shouldThrow<IllegalArgumentException> {
@@ -34,7 +39,10 @@ class AuthServiceTest : BehaviorSpec({
         `when`("email is new") {
             every { userRepository.findByEmail(any()) } returns null
             every { passwordEncoder.encode(any()) } returns "encodedPw"
-            every { userRepository.save(any()) } answers { firstArg() as User } // Mock save returns argument
+            every { userRepository.save(any()) } answers { spyk(firstArg<User>()){
+                every { id } returns userId
+            } }
+
 
             then("it should create a new user") {
                 val response = authService.signup(request)

@@ -12,12 +12,12 @@ class GlobalExceptionHandler {
     fun handleException(e: Exception): ResponseEntity<ApiResponse<Unit>> {
         // TODO: Log the exception properly with SLF4J
         return ResponseEntity.internalServerError()
-            .body(ApiResponse.error(e.message ?: "An unknown error occurred"))
+            .body(ApiResponse(null,e.message ?: "An unknown error occurred"))
     }
-    
+
     @ExceptionHandler(IllegalArgumentException::class)
     fun handleIllegalArgumentException(e: IllegalArgumentException): ResponseEntity<ApiResponse<Unit>> {
         return ResponseEntity.badRequest()
-            .body(ApiResponse.error(e.message ?: "Invalid argument"))
+            .body(ApiResponse(null,e.message ?: "Invalid argument"))
     }
 }
