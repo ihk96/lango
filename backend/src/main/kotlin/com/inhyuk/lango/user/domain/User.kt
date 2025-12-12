@@ -17,7 +17,6 @@ class User(
     @Enumerated(EnumType.STRING)
     var role: UserRole = UserRole.USER,
 
-    var currentLevel: String? = null
 ) {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

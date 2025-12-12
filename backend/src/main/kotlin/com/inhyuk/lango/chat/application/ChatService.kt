@@ -37,7 +37,7 @@ class ChatService(
     fun createSession(id: String, topic: String?): ChatSessionResponse {
         val user = userRepository.findById(id).orElseThrow { IllegalArgumentException("User not found") }
         
-        val userLevel = user.currentLevel ?: "Beginner"
+        val userLevel = "Beginner"
         val prompt = promptManager.getScenarioGenerationPrompt(userLevel, topic)
         val responseFormat = ResponseFormat.builder()
             .type(ResponseFormatType.JSON)

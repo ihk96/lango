@@ -21,7 +21,7 @@ class LevelServiceTest : BehaviorSpec({
 
     given("An initial assessment request") {
         val email = "test@example.com"
-        val user = User(email, "pw", "nick", currentLevel = "Beginner")
+        val user = User(email, "pw", "nick")
         
         `when`("assessing user answers") {
             every { userRepository.findByEmail(email) } returns user
@@ -35,7 +35,6 @@ class LevelServiceTest : BehaviorSpec({
                 val response = levelService.assessInitialLevel(email, "My answers")
                 
                 response.level shouldBe "Advanced"
-                user.currentLevel shouldBe "Advanced"
             }
         }
     }

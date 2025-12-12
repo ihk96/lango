@@ -21,7 +21,7 @@ class ArticleServiceTest : BehaviorSpec({
 
     given("An article generation request") {
         val email = "test@example.com"
-        val user = User(email, "pw", "nick", currentLevel = "Advanced")
+        val user = User(email, "pw", "nick")
         
         `when`("user exists") {
             every { userRepository.findByEmail(email) } returns user

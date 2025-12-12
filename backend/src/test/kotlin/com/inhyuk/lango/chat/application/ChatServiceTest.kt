@@ -38,7 +38,7 @@ class ChatServiceTest : BehaviorSpec({
 
     given("A scenario generation request") {
         val email = "test@example.com"
-        val user = User(email, "pw", "nick", currentLevel = "Beginner")
+        val user = User(email, "pw", "nick")
         
         `when`("starting a session") {
             every { userRepository.findById(any<String>()) } returns Optional.of(user)

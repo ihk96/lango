@@ -23,7 +23,7 @@ class UserControllerTest : BehaviorSpec({
 
     given("A signup request") {
         val request = SignupRequest("test@test.com", "pw", "nick")
-        val response = UserResponse(UUID.randomUUID().toString(), "test@test.com", "nick", null)
+        val response = UserResponse(UUID.randomUUID().toString(), "test@test.com", "nick")
 
         `when`("service returns success") {
             every { authService.signup(any()) } returns response
@@ -41,7 +41,7 @@ class UserControllerTest : BehaviorSpec({
     
     given("A login request") {
         val request = LoginRequest("test@test.com", "pw")
-        val response = UserResponse(UUID.randomUUID().toString(), "test@test.com", "nick", null)
+        val response = UserResponse(UUID.randomUUID().toString(), "test@test.com", "nick")
         
         `when`("service returns success") {
             every { authService.login(any(), any()) } returns response

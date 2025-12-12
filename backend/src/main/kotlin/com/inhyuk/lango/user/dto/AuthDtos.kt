@@ -29,7 +29,6 @@ data class UserResponse(
     val id: String,
     val email: String,
     val nickname: String,
-    val currentLevel: String?
 ) {
     companion object {
         fun from(user: User): UserResponse {
@@ -37,7 +36,6 @@ data class UserResponse(
                 id = user.id!!,
                 email = user.email,
                 nickname = user.nickname,
-                currentLevel = user.currentLevel
             )
         }
     }

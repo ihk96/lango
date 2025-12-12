@@ -21,7 +21,7 @@ class ArticleService(
         val user = userRepository.findByEmail(email)
             ?: throw IllegalArgumentException("User not found")
             
-        val userLevel = user.currentLevel ?: "Beginner"
+        val userLevel = "Beginner"
         val prompt = promptManager.getArticleGenerationPrompt(userLevel, topic)
         
         val response = chatModel.chat(prompt)

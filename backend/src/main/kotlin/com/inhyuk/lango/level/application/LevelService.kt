@@ -34,7 +34,7 @@ class LevelService(
         
         val response = objectMapper.readValue(responseStr, AssessmentResponse::class.java)
         
-        user.currentLevel = response.level
+//        user.currentLevel = response.level
         // User entity variable 'currentLevel' is mutable, dirty checking will save it.
         // However, I should make sure User.currentLevel is var. (It is)
         

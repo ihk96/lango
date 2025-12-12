@@ -9,10 +9,10 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
-class ModelConfig {
-
-    @Value("\${google.api.key}")
-    private lateinit var apiKey: String
+class ModelConfig(
+    @Value("\${llm.api.key}")
+    private val apiKey: String
+) {
 
     @Bean
     fun chatModel(): ChatModel {

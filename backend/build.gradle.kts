@@ -70,6 +70,7 @@ dependencies {
     testImplementation("io.kotest:kotest-assertions-core:4.4.3")
     testImplementation("io.kotest:kotest-extensions-spring:4.4.3")
     testImplementation("io.mockk:mockk:1.13.13")
+    testImplementation("org.yaml:snakeyaml:2.2") // yml parser
 }
 
 kotlin {
@@ -86,4 +87,6 @@ allOpen {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+    // main 리소스를 테스트 classpath에 추가
+    classpath = sourceSets["main"].runtimeClasspath + classpath
 }
