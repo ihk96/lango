@@ -1,8 +1,10 @@
 package com.inhyuk.lango.level.prompt
 
+import com.inhyuk.lango.level.dto.LevelTestAnswer
+
 class LevelTestEvalGuidePrompt {
     companion object{
-        fun getTestEvaluationSystemPrompt(): String {
+        fun getTestEvaluationSystemPrompt(levelTestAnswer: LevelTestAnswer): String {
             return """
                 <Level Test Evaluation Guideline>
                     학습자의 정확한 CEFR 레벨(A1.1~C2.3)을 평가하기 위한 문제와 학습자의 답안지가 준비되어 있습니다.
@@ -127,6 +129,39 @@ class LevelTestEvalGuidePrompt {
                     </Evaluation Guideline>
                     
                     <Test And Answer>
+                        # 어휘 문제 및 답안
+                        ${levelTestAnswer.vocabulary.map { """
+                            레벨 : ${it.question.level}
+                            유형 : ${it.question.type}
+                            지문 : ${it.question.question}
+                            정답 : ${it.question.answer}
+                            답안(학습자) : ${it.answer}
+                        """.trimIndent() } }
+                        
+                        # 문법 문제 및 답안
+                        ${levelTestAnswer.grammar.map { """
+                            레벨 : ${it.question.level}
+                            지문 : ${it.question.passageText}
+                            선택지 : ${it.question.options.joinToString(", ")}
+                            정답 : ${it.question.answer}
+                            답안(학습자) : ${it.answer}
+                        """.trimIndent() }}
+                        
+                        # 독해 문제 및 답안
+                        ${levelTestAnswer.reading.map { """
+                            레벨 : ${it.question.level}
+                            지문 : ${it.question.passageText}
+                            질문 : ${it.question.question}
+                            정답 : ${it.question.answer}
+                            답안(학습자) : ${it.answer}
+                        """.trimIndent() }}
+                        
+                        # 작문 문제 및 답안
+                        ${levelTestAnswer.writing.map { """
+                            레벨 : ${it.question.level}
+                            질문 : ${it.question.question}
+                            답안(학습자) : ${it.answer}
+                        """.trimIndent() }}
                         
                     </Test And Answer>
                     

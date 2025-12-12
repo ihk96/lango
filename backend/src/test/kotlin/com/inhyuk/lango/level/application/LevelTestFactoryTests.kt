@@ -1,17 +1,13 @@
 package com.inhyuk.lango.level.application
 
-import com.inhyuk.lango.ConfigurationLoader
-import com.inhyuk.lango.llm.model.ModelConfig
+import com.inhyuk.lango.ModelConfigForTest
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import tools.jackson.databind.ObjectMapper
 
 class LevelTestFactoryTests : BehaviorSpec({
-    val config = ConfigurationLoader.loadConfig("application-local.yml")
-    val apiKey = ((config["llm"] as Map<String, Any>)["api"] as Map<String, Any>)["key"] as String
-    val modelConfig = ModelConfig(apiKey)
 
-    val chatModel = modelConfig.fastChatModel()
+    val chatModel = ModelConfigForTest.chatModel
 
     val levelTestFactory = LevelTestFactory(
         chatModel,

@@ -3,7 +3,7 @@ package com.inhyuk.lango.level.domain
 class Levels {
     companion object {
         val A1_1 = CEFRLevel(
-            level = "A1-1",
+            level = "A1.1",
             vocabulary = CEFRVocabularyCount(300, 500),
             grammar = CEFRGrammar(
                 allowed = listOf(
@@ -38,7 +38,7 @@ class Levels {
         )
 
         val A1_2 = CEFRLevel(
-            level = "A1-2",
+            level = "A1.2",
             vocabulary = CEFRVocabularyCount(600, 800),
             grammar = CEFRGrammar(
                 allowed = listOf(
@@ -58,7 +58,7 @@ class Levels {
             reading = CEFRReading(
                 wordCountRange = IntRange(50, 100),
                 sentenceLengthRange = IntRange(5, 12),
-                complexity = "2-3개 관련 문장. 시간 순서 명확."
+                complexity = "2.3개 관련 문장. 시간 순서 명확."
             ),
             writing = CEFRWriting(
                 expectedLengthRange = IntRange(15, 25),
@@ -73,7 +73,7 @@ class Levels {
         )
 
         val A1_3 = CEFRLevel(
-            level = "A1-3",
+            level = "A1.3",
             vocabulary = CEFRVocabularyCount(800, 1000),
             grammar = CEFRGrammar(
                 allowed = listOf(
@@ -108,7 +108,7 @@ class Levels {
         )
 
         val A2_1 = CEFRLevel(
-            level = "A2-1",
+            level = "A2.1",
             vocabulary = CEFRVocabularyCount(1200, 1500),
             grammar = CEFRGrammar(
                 allowed = listOf(
@@ -143,7 +143,7 @@ class Levels {
         )
 
         val A2_2 = CEFRLevel(
-            level = "A2-2",
+            level = "A2.2",
             vocabulary = CEFRVocabularyCount(1600, 2000),
             grammar = CEFRGrammar(
                 allowed = listOf(
@@ -178,7 +178,7 @@ class Levels {
         )
 
         val A2_3 = CEFRLevel(
-            level = "A2-3",
+            level = "A2.3",
             vocabulary = CEFRVocabularyCount(2000, 2500),
             grammar = CEFRGrammar(
                 allowed = listOf(
@@ -212,7 +212,7 @@ class Levels {
         )
 
         val B1_1 = CEFRLevel(
-            level = "B1-1",
+            level = "B1.1",
             vocabulary = CEFRVocabularyCount(2400, 3000),
             grammar = CEFRGrammar(
                 allowed = listOf(
@@ -247,7 +247,7 @@ class Levels {
         )
 
         val B1_2 = CEFRLevel(
-            level = "B1-2",
+            level = "B1.2",
             vocabulary = CEFRVocabularyCount(2800, 3500),
             grammar = CEFRGrammar(
                 allowed = listOf(
@@ -281,7 +281,7 @@ class Levels {
         )
 
         val B1_3 = CEFRLevel(
-            level = "B1-3",
+            level = "B1.3",
             vocabulary = CEFRVocabularyCount(3200, 4000),
             grammar = CEFRGrammar(
                 allowed = listOf(
@@ -315,7 +315,7 @@ class Levels {
         )
 
         val B2_1 = CEFRLevel(
-            level = "B2-1",
+            level = "B2.1",
             vocabulary = CEFRVocabularyCount(4000, 5000),
             grammar = CEFRGrammar(
                 allowed = listOf(
@@ -348,7 +348,7 @@ class Levels {
         )
 
         val B2_2 = CEFRLevel(
-            level = "B2-2",
+            level = "B2.2",
             vocabulary = CEFRVocabularyCount(4800, 6000),
             grammar = CEFRGrammar(
                 allowed = listOf(
@@ -379,7 +379,7 @@ class Levels {
         )
 
         val B2_3 = CEFRLevel(
-            level = "B2-3",
+            level = "B2.3",
             vocabulary = CEFRVocabularyCount(5600, 7000),
             grammar = CEFRGrammar(
                 allowed = listOf(
@@ -408,7 +408,7 @@ class Levels {
         )
 
         val C1_1 = CEFRLevel(
-            level = "C1-1",
+            level = "C1.1",
             vocabulary = CEFRVocabularyCount(7000, 9000),
             grammar = CEFRGrammar(
                 allowed = listOf(
@@ -435,7 +435,7 @@ class Levels {
         )
 
         val C1_2 = CEFRLevel(
-            level = "C1-2",
+            level = "C1.2",
             vocabulary = CEFRVocabularyCount(8500, 11000),
             grammar = CEFRGrammar(
                 allowed = listOf(
@@ -462,7 +462,7 @@ class Levels {
         )
 
         val C1_3 = CEFRLevel(
-            level = "C1-3",
+            level = "C1.3",
             vocabulary = CEFRVocabularyCount(10000, 13000),
             grammar = CEFRGrammar(
                 allowed = listOf(
@@ -489,7 +489,7 @@ class Levels {
         )
 
         val C2_1 = CEFRLevel(
-            level = "C2-1",
+            level = "C2.1",
             vocabulary = CEFRVocabularyCount(12000, 16000),
             grammar = CEFRGrammar(
                 allowed = listOf(
@@ -515,7 +515,7 @@ class Levels {
         )
 
         val C2_2 = CEFRLevel(
-            level = "C2-2",
+            level = "C2.2",
             vocabulary = CEFRVocabularyCount(15000, 20000),
             grammar = CEFRGrammar(
                 allowed = listOf(
@@ -541,7 +541,7 @@ class Levels {
         )
 
         val C2_3 = CEFRLevel(
-            level = "C2-3",
+            level = "C2.3",
             vocabulary = CEFRVocabularyCount(18000, 25000),
             grammar = CEFRGrammar(
                 allowed = listOf(
@@ -565,6 +565,28 @@ class Levels {
                 exampleRequired = false
             ),
         )
+        fun findLevel(level : String) : CEFRLevel?{
+            if(level == "A1.1") return A1_1
+            if(level == "A1.2") return A1_2
+            if(level == "A1.3") return A1_3
+            if(level == "A2.1") return A2_1
+            if(level == "A2.2") return A2_2
+            if(level == "A2.3") return A2_3
+            if(level == "B1.1") return B1_1
+            if(level == "B1.2") return B1_2
+            if(level == "B1.3") return B1_3
+            if(level == "B2.1") return B2_1
+            if(level == "B2.2") return B2_2
+            if(level == "B2.3") return B2_3
+            if(level == "C1.1") return C1_1
+            if(level == "C1.2") return C1_2
+            if(level == "C1.3") return C1_3
+            if(level == "C2.1") return C2_1
+            if(level == "C2.2") return C2_2
+            if(level == "C2.3") return C2_3
+
+            return null
+        }   
     }
 
 }

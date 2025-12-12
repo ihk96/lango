@@ -105,7 +105,7 @@ class LevelTestGuidePrompt {
                     ```
                     질문: "What is the main advantage of working from home?"
 
-                    **지문 4 (B2 수준)**: 250-350단어, 전문적 내용, 복잡한 논리, 영어로 질문, 영어로 정답
+                    **지문 4 (B2 수준)**: 250-350단어, 전문적 내용, 복잡한 논리, 영어로 질문, 한국어 정답
                     ```
                     Recent studies have shown that artificial intelligence is transforming
                     various industries. However, the implementation of such technology
@@ -113,7 +113,7 @@ class LevelTestGuidePrompt {
                     ```
                     질문: "What concern does the author mention about AI?"
 
-                    **지문 5 (C1 수준)**: 400-500단어, 학술적, 추상적 개념, 영어로 질문, 영어로 정답
+                    **지문 5 (C1 수준)**: 400-500단어, 학술적, 추상적 개념, 영어로 질문, 한국어 정답
                     ```
                     The philosophical implications of quantum mechanics extend far beyond
                     the realm of physics. The uncertainty principle, for instance, challenges
