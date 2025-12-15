@@ -1,6 +1,5 @@
 package com.inhyuk.lango.user.application
 
-import com.inhyuk.lango.chat.domain.ChatSession
 import com.inhyuk.lango.user.domain.User
 import com.inhyuk.lango.user.dto.LoginRequest
 import com.inhyuk.lango.user.dto.SignupRequest

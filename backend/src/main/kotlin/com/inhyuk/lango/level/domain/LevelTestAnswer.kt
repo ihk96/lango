@@ -1,4 +1,4 @@
-package com.inhyuk.lango.level.dto
+package com.inhyuk.lango.level.domain
 
 data class VocabularyTestAnswer(
     val question: VocabularyTestQuestion,
@@ -18,8 +18,8 @@ data class WritingTestAnswer(
 )
 
 data class LevelTestAnswer(
-    val vocabulary: List<VocabularyTestAnswer>,
-    val grammar: List<GrammarTestAnswer>,
-    val reading: List<ReadingTestAnswer>,
-    val writing: List<WritingTestAnswer>
+    var vocabulary: MutableList<VocabularyTestAnswer> = mutableListOf(),
+    var grammar: MutableList<GrammarTestAnswer> = mutableListOf(),
+    var reading: MutableList<ReadingTestAnswer> = mutableListOf(),
+    var writing: MutableList<WritingTestAnswer> = mutableListOf()
 )

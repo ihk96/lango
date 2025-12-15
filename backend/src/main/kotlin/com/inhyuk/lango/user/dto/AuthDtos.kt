@@ -1,6 +1,6 @@
 package com.inhyuk.lango.user.dto
 
-import com.inhyuk.lango.user.domain.User
+import com.inhyuk.lango.user.domain.UserEntity
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 
@@ -31,7 +31,7 @@ data class UserResponse(
     val nickname: String,
 ) {
     companion object {
-        fun from(user: User): UserResponse {
+        fun from(user: UserEntity): UserResponse {
             return UserResponse(
                 id = user.id!!,
                 email = user.email,

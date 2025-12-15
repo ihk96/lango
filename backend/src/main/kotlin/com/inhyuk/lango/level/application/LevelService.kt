@@ -1,7 +1,10 @@
 package com.inhyuk.lango.level.application
 
+import com.inhyuk.lango.level.domain.CEFRLevel
+import com.inhyuk.lango.level.domain.UserLevelEntity
 import com.inhyuk.lango.level.dto.AssessmentResponse
 import com.inhyuk.lango.level.dto.QuestionResponse
+import com.inhyuk.lango.level.infrastructure.UserLevelRepository
 import com.inhyuk.lango.llm.prompt.PromptManager
 import com.inhyuk.lango.user.infrastructure.UserRepository
 import dev.langchain4j.model.chat.ChatModel
@@ -14,8 +17,10 @@ class LevelService(
     private val userRepository: UserRepository,
     private val promptManager: PromptManager,
     private val chatModel: ChatModel,
-    private val objectMapper: ObjectMapper
-) {
+    private val objectMapper: ObjectMapper,
+    private val userLevelRepository: UserLevelRepository,
+
+    ) {
     fun getInitialQuestions(): List<QuestionResponse> {
         return listOf(
             QuestionResponse(1, "What are your hobbies? Describe them in detail."),
@@ -39,5 +44,26 @@ class LevelService(
         // However, I should make sure User.currentLevel is var. (It is)
         
         return response
+    }
+
+    fun getUserslevel(userId : String): UserLevelEntity {
+        val level = userLevelRepository.findByUserId(userId) ?: throw IllegalArgumentException("User level not found")
+
+        return level
+    }
+
+    @Transactional
+    fun saveUserLevel(userId: String, level : CEFRLevel) : UserLevelEntity{
+        return userLevelRepository.save(UserLevelEntity(
+            userId = userId,
+            level = level.level
+        ))
+    }
+    @Transactional
+    fun saveUserLevel(userId: String, level : String) : UserLevelEntity{
+        return userLevelRepository.save(UserLevelEntity(
+            userId = userId,
+            level = level
+        ))
     }
 }

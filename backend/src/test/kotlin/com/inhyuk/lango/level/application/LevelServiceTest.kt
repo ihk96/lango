@@ -1,6 +1,7 @@
 package com.inhyuk.lango.level.application
 
 import com.inhyuk.lango.level.dto.AssessmentResponse
+import com.inhyuk.lango.level.infrastructure.UserLevelRepository
 import com.inhyuk.lango.llm.prompt.PromptManager
 import com.inhyuk.lango.user.domain.User
 import com.inhyuk.lango.user.infrastructure.UserRepository
@@ -16,8 +17,9 @@ class LevelServiceTest : BehaviorSpec({
     val promptManager = mockk<PromptManager>()
     val chatModel = mockk<ChatModel>()
     val objectMapper = mockk<ObjectMapper>()
+    val userLevelRepository = mockk<UserLevelRepository>()
     
-    val levelService = LevelService(userRepository, promptManager, chatModel, objectMapper)
+    val levelService = LevelService(userRepository, promptManager, chatModel, objectMapper, userLevelRepository)
 
     given("An initial assessment request") {
         val email = "test@example.com"
@@ -30,7 +32,7 @@ class LevelServiceTest : BehaviorSpec({
             
             val assessmentResponse = AssessmentResponse("Advanced", "Good vocabs")
             every { objectMapper.readValue("{}", AssessmentResponse::class.java) } returns assessmentResponse
-            
+
             then("it should update user level and return result") {
                 val response = levelService.assessInitialLevel(email, "My answers")
                 

@@ -1,8 +1,8 @@
 package com.inhyuk.lango.level.application
 
-import com.inhyuk.lango.level.dto.GrammarTestQuestion
-import com.inhyuk.lango.level.dto.ReadingTestQuestion
-import com.inhyuk.lango.level.dto.VocabularyTestQuestion
+import com.inhyuk.lango.level.domain.GrammarTestQuestion
+import com.inhyuk.lango.level.domain.ReadingTestQuestion
+import com.inhyuk.lango.level.domain.VocabularyTestQuestion
 import com.inhyuk.lango.level.prompt.CEFRLevelPrompt
 import com.inhyuk.lango.level.prompt.LevelTestGuidePrompt
 import dev.langchain4j.data.message.UserMessage

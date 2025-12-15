@@ -1,26 +1,29 @@
 package com.inhyuk.lango.chat.dto
 
-import com.inhyuk.lango.chat.domain.ChatSession
+import com.inhyuk.lango.chat.domain.ChatSessionEntity
 
 data class ScenarioGenerationResponse(
+    val title : String,
     val scenario: String,
     val yourRole: String,
     val userRole: String
 )
 
 data class ChatSessionResponse(
-    val sessionId: Long,
+    val sessionId: String,
+    val title: String,
     val scenario: String,
     val userRole: String,
     val aiRole: String,
 ) {
     companion object {
-        fun from(session: ChatSession): ChatSessionResponse {
+        fun from(session: ChatSessionEntity): ChatSessionResponse {
             return ChatSessionResponse(
                 sessionId = session.id!!,
                 scenario = session.scenario,
                 userRole = session.userRole,
-                aiRole = session.aiRole
+                aiRole = session.aiRole,
+                title = session.title
             )
         }
     }
@@ -31,5 +34,6 @@ data class ChatMessageRequest(
 )
 
 data class ChatMessageResponse(
-    val content: String
+    val content: String,
+    val subContent : String?
 )

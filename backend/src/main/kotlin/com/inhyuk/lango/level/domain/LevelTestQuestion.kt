@@ -1,4 +1,4 @@
-package com.inhyuk.lango.level.dto
+package com.inhyuk.lango.level.domain
 
 data class VocabularyTestQuestion (
     val question: String,
@@ -24,4 +24,11 @@ data class GrammarTestQuestion(
     val answer: String,
     val level: String,
     val options: List<String>
+)
+
+data class TestQuestions(
+    var vocabulary: List<VocabularyTestQuestion> = emptyList(),
+    var grammar: List<GrammarTestQuestion> = emptyList(),
+    var reading: List<ReadingTestQuestion> = emptyList(),
+    var writing: List<WritingTestQuestion> = emptyList()
 )

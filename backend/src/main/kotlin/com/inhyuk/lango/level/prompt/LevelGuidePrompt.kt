@@ -15,7 +15,6 @@ class LevelGuidePrompt {
                     - 특히 상위 빈도 ${level.vocabulary.commonWords}개 단어를 우선적으로 사용하세요
                     - 관용구, 전문 용어, 희귀한 단어는 피하세요
 
-                    
                     # 문법 규칙
                     ## 사용 가능한 문법:
                     ${level.grammar.allowed.map{"  - ${it}"}.joinToString("\n")} 
@@ -29,23 +28,10 @@ class LevelGuidePrompt {
                     
                     # 대화 방식
                     - 응답 스타일: ${level.interaction.responseStyle}
-                    - 피드백 방식: ${level.interaction.feedbackDetail}
-                    - 예시 제공: ${if(level.interaction.exampleRequired) "항상 필수" else "필요시에만"}
-                    
-                    # 오류 허용도
-                    학습자의 글쓰기에서 최대 ${level.writing.errorTolerance}%의 오류를 허용합니다.
-                    
-                    # 오류 교정 방법
-                    학습자가 실수를 하면:
-                    1. 오류 유형을 파악하세요 (문법/어휘/철자)
-                    2. 왜 틀렸는지 쉬운 말로 설명하세요
-                    3. 올바른 형태를 제시하세요
-                    4. ${if(level.interaction.exampleRequired)"2-3개의 비슷한 예시를 추가로 보여주세요" else  "간단히 넘어가세요"}
-                    
+                                      
                     ## 중요 규칙
                     - 학습자의 레벨보다 어려운 표현을 쓰지 마세요
                     - 자연스러운 대화를 유지하되, 교육적 목적을 잊지 마세요
-                    - 학습자가 사용한 문법이 현재 레벨을 넘어서면 부드럽게 지적하세요
                 </Level Guideline>
             """.trimIndent()
         }

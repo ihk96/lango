@@ -1,16 +1,21 @@
 package com.inhyuk.lango.chat.application
 
-import com.inhyuk.lango.chat.domain.ChatMessage
-import com.inhyuk.lango.chat.domain.ChatSession
+import com.inhyuk.lango.chat.domain.ChatMessageEntity
+import com.inhyuk.lango.chat.domain.ChatSessionEntity
 import com.inhyuk.lango.chat.domain.MessageSender
+import com.inhyuk.lango.chat.domain.ScenarioChatMessage
 import com.inhyuk.lango.chat.dto.ChatMessageResponse
 import com.inhyuk.lango.chat.dto.ChatSessionResponse
 import com.inhyuk.lango.chat.dto.ScenarioGenerationResponse
 import com.inhyuk.lango.chat.infrastructure.ChatMessageRepository
 import com.inhyuk.lango.chat.infrastructure.ChatSessionRepository
+import com.inhyuk.lango.chat.prompt.ChatPrompt
+import com.inhyuk.lango.level.domain.Levels
+import com.inhyuk.lango.level.infrastructure.UserLevelRepository
 import com.inhyuk.lango.llm.prompt.PromptManager
 import com.inhyuk.lango.user.infrastructure.UserRepository
 import dev.langchain4j.data.message.AiMessage
+import dev.langchain4j.data.message.ChatMessage
 import dev.langchain4j.data.message.SystemMessage
 import dev.langchain4j.data.message.UserMessage
 import dev.langchain4j.model.chat.ChatModel
@@ -31,14 +36,29 @@ class ChatService(
     private val promptManager: PromptManager,
     private val chatModel: ChatModel,
     private val objectMapper: ObjectMapper,
+    private val userLevelRepository: UserLevelRepository,
 ) {
 
+    fun getChatSessions(userId: String): List<ChatSessionEntity> {
+        return chatSessionRepository.findByUserIdOrderByCreatedAtDesc(userId)
+    }
+
+    fun getChatSession(sessionId: String): ChatSessionEntity {
+        return chatSessionRepository.findById(sessionId).orElseThrow { IllegalArgumentException("Session not found") }
+    }
+
+    fun getChatHistory(sessionId: String): List<ChatMessageEntity> {
+        return chatMessageRepository.findBySessionIdOrderByCreatedAtAsc(sessionId)
+    }
+
     @Transactional
-    fun createSession(id: String, topic: String?): ChatSessionResponse {
-        val user = userRepository.findById(id).orElseThrow { IllegalArgumentException("User not found") }
+    fun createSession(userId: String, topic: String?): ChatSessionEntity? {
+        val user = userRepository.findById(userId).orElseThrow { IllegalArgumentException("User not found") }
         
-        val userLevel = "Beginner"
-        val prompt = promptManager.getScenarioGenerationPrompt(userLevel, topic)
+        val userLevel = userLevelRepository.findByUserId(userId) ?: throw IllegalArgumentException("User level not found")
+        val level = Levels.findLevel(userLevel.level) ?: throw IllegalArgumentException("Invalid user level")
+
+        val prompt = ChatPrompt.getScenarioGenerationPrompt(level, topic)
         val responseFormat = ResponseFormat.builder()
             .type(ResponseFormatType.JSON)
             .jsonSchema(JsonSchema.builder()
@@ -46,9 +66,10 @@ class ChatService(
                 .rootElement(JsonObjectSchema.builder()
                     .description("Scenario generation response")
                     .addStringProperty("scenario","시나리오에 대한 설명...")
+                    .addStringProperty("title","시나리오 제목")
                     .addStringProperty("yourRole","당신의 역할(예: Barista, Ticket Agent, Team Leader)")
                     .addStringProperty("userRole","사용자의 역할(예: Customer, Waiter, Team Member)")
-                    .required("scenario", "yourRole", "userRole")
+                    .required("scenario", "yourRole", "userRole", "title")
                     .build())
                 .build())
             .build()
@@ -60,79 +81,138 @@ class ChatService(
         val response = chatModel.chat(request)
         val scenarioData = objectMapper.readValue(response.aiMessage().text(), ScenarioGenerationResponse::class.java)
 
-        val session = chatSessionRepository.save(ChatSession(
-            user = user,
-            scenario = scenarioData.scenario,
-            userRole = scenarioData.userRole,
-            aiRole = scenarioData.yourRole,
-            userLevel = userLevel
-        ))
+        val session = user.id?.let {
+            chatSessionRepository.save(ChatSessionEntity(
+                userId = it,
+                scenario = scenarioData.scenario,
+                userRole = scenarioData.userRole,
+                aiRole = scenarioData.yourRole,
+                userLevel = userLevel.level,
+                title = scenarioData.title
+            ))
+        }
         
 
-        return ChatSessionResponse.from(session)
+        return session
     }
 
     @Transactional
-    fun startSessionChat(sessionId: Long): ChatMessageResponse {
+    fun startSessionChat(sessionId: String): ScenarioChatMessage {
         val session = chatSessionRepository.findById(sessionId)
             .orElseThrow { IllegalArgumentException("Session not found") }
+        val level = Levels.findLevel(session.userLevel) ?: throw IllegalArgumentException("Invalid user level")
 
-        val prompt = promptManager.getChatSystemPrompt(
+        val prompt = ChatPrompt.getChatSystemPrompt(
             aiRole = session.aiRole,
             userRole = session.userRole,
-            scenario = session.scenario,
-            level = session.userLevel
+            level = level,
+            scenario = session.scenario
         )
+        val responseFormat = ResponseFormat.builder()
+            .type(ResponseFormatType.JSON)
+            .jsonSchema(JsonSchema.builder()
+                .name("ScenarioChatResponse")
+                .rootElement(JsonObjectSchema.builder()
+                    .description("Scenario chat response")
+                    .addStringProperty("message","롤플레이 응답문 (영문)")
+                    .addStringProperty("translate","응답문의 번역 (한글)")
+                    .addStringProperty("code","응답에 대한 구분값 입니다. 사용자가 시나리오와 안맞는 대화를 하거나 부적절한 대화나 요청을 하면 '-1', 정상적인 대화인 경우 '0'을 입력")
+                    .required("content", "translate", "code")
+                    .build())
+                .build())
+            .build()
         val request = ChatRequest.builder()
             .messages(SystemMessage(prompt))
+            .responseFormat(responseFormat)
             .build()
 
         val response = chatModel.chat(request)
+        var scenarioData = objectMapper.readValue(response.aiMessage().text(), ScenarioChatMessage::class.java)
+        if(scenarioData.code != 0) {
+            scenarioData = scenarioData.copy(message = "Sorry, I didn't understand you.")
+        }
+        saveAiMessage(session, scenarioData)
 
-        val text = response.aiMessage().text()
-        saveMessage(session, text, MessageSender.AI)
-
-        return ChatMessageResponse(text)
+        return scenarioData
     }
 
     @Transactional
-    fun chatMessage(sessionId: Long, userMessageContent: String) : ChatMessageResponse{
+    fun chatMessage(userId : String, sessionId: String, userMessageContent: String) : ScenarioChatMessage{
         val session = chatSessionRepository.findById(sessionId)
             .orElseThrow { IllegalArgumentException("Session not found") }
-            
+
         // Save User Message
-        saveMessage(session, userMessageContent, MessageSender.USER)
+        saveUserMessage(session, userMessageContent)
         
         // Build Context
         val history = chatMessageRepository.findBySessionIdOrderByCreatedAtAsc(sessionId)
-        val lcMessages = mutableListOf<dev.langchain4j.data.message.ChatMessage>()
+        val lcMessages = mutableListOf<ChatMessage>()
         
         // Add System Prompt
         lcMessages.add(SystemMessage(promptManager.getChatSystemPrompt(session.aiRole, session.userLevel, session.userLevel, session.scenario)))
-        
-        // Add History
-        history.forEach { msg ->
-            when (msg.sender) {
-                MessageSender.USER -> lcMessages.add(UserMessage(msg.content))
-                MessageSender.AI -> lcMessages.add(AiMessage(msg.content))
-                else -> {} // Skip System internal messages if any
+
+        history.map { it->
+            when(it.sender) {
+                MessageSender.USER -> UserMessage(it.content)
+                MessageSender.AI -> AiMessage(it.content)
+                else -> {}
             }
         }
-        
-        val response = chatModel.chat(lcMessages)
-        val text = response.aiMessage().text()
-        saveMessage(session, text, MessageSender.AI)
-        return ChatMessageResponse(text)
+
+        val level = Levels.findLevel(session.userLevel) ?: throw IllegalArgumentException("Invalid user level")
+
+        val prompt = ChatPrompt.getChatSystemPrompt(
+            aiRole = session.aiRole,
+            userRole = session.userRole,
+            level = level,
+            scenario = session.scenario
+        )
+        val responseFormat = ResponseFormat.builder()
+            .type(ResponseFormatType.JSON)
+            .jsonSchema(JsonSchema.builder()
+                .name("ScenarioChatResponse")
+                .rootElement(JsonObjectSchema.builder()
+                    .description("Scenario chat response")
+                    .addStringProperty("message","롤플레이 응답문 (영문)")
+                    .addStringProperty("translate","응답문의 번역 (한글)")
+                    .addStringProperty("code","응답에 대한 구분값 입니다. 사용자가 시나리오와 안맞는 대화를 하거나 부적절한 대화나 요청을 하면 '-1', 정상적인 대화인 경우 '0'을 입력")
+                    .required("content", "translate", "code")
+                    .build())
+                .build())
+            .build()
+        val request = ChatRequest.builder()
+            .messages(SystemMessage(prompt),*lcMessages.toTypedArray())
+            .responseFormat(responseFormat)
+            .build()
+
+        val response = chatModel.chat(request)
+        var scenarioData = objectMapper.readValue(response.aiMessage().text(), ScenarioChatMessage::class.java)
+        if(scenarioData.code != 0) {
+            scenarioData = scenarioData.copy(message = "Sorry, I didn't understand you.")
+        }
+        saveAiMessage(session, scenarioData)
+
+        return scenarioData
     }
     
-    // Extracted helper
-    private fun saveMessage(session: ChatSession, content: String, sender: MessageSender) {
-       chatMessageRepository.save(ChatMessage(session = session, content = content, sender = sender))
+    private fun saveAiMessage(session: ChatSessionEntity, message : ScenarioChatMessage) {
+        session.id?.let {
+            chatMessageRepository.save(ChatMessageEntity(
+                sessionId = it,
+                content = message.message,
+                subContent = message.translate,
+                sender = MessageSender.AI,
+            ))
+        }
     }
     
-    // Separate method for callback usage (avoiding @Transactional proxy issues if private, 
-    // but repository.save is transactional by default so it's fine)
-    fun createAndSaveMessage(session: ChatSession, content: String, sender: MessageSender) {
-        chatMessageRepository.save(ChatMessage(session = session, content = content, sender = sender))
+    fun saveUserMessage(session: ChatSessionEntity, content: String) {
+        session.id?.let {
+            chatMessageRepository.save(ChatMessageEntity(
+                sessionId = it,
+                content = content,
+                sender = MessageSender.USER
+            ))
+        }
     }
 }

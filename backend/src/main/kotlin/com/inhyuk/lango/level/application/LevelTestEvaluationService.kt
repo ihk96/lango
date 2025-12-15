@@ -2,19 +2,16 @@ package com.inhyuk.lango.level.application
 
 import com.inhyuk.lango.level.domain.CEFRLevel
 import com.inhyuk.lango.level.domain.Levels
-import com.inhyuk.lango.level.dto.LevelTestAnswer
+import com.inhyuk.lango.level.domain.LevelTestAnswer
 import com.inhyuk.lango.level.prompt.LevelTestEvalGuidePrompt
 import dev.langchain4j.data.message.UserMessage
 import dev.langchain4j.model.chat.ChatModel
 import dev.langchain4j.model.chat.request.ChatRequest
 import dev.langchain4j.model.chat.request.ResponseFormat
 import dev.langchain4j.model.chat.request.ResponseFormatType
-import dev.langchain4j.model.chat.request.json.JsonArraySchema
-import dev.langchain4j.model.chat.request.json.JsonObjectSchema
 import dev.langchain4j.model.chat.request.json.JsonSchema
 import dev.langchain4j.model.chat.request.json.JsonStringSchema
 import org.springframework.stereotype.Component
-import tools.jackson.databind.ObjectMapper
 
 @Component
 class LevelTestEvaluationService(
@@ -37,16 +34,18 @@ class LevelTestEvaluationService(
         
         val request = ChatRequest.builder()
             .messages(UserMessage(prompt))
+            .temperature(0.2)
             .responseFormat(responseFormat)
             .build()
         
         val response = chatModel.chat(request)
-        val levelText = response.aiMessage().text()
+        val levelText = response.aiMessage().text().replace("\"", "")
 
-        val level = Levels.findLevel(levelText)
+        val level = Levels.findLevel(levelText.trim())
 
         return level ?: throw IllegalStateException(
             "Level evaluation failed. Response: $levelText"
         )
     }
+
 }

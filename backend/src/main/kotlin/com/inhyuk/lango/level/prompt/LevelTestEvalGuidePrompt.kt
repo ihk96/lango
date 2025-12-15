@@ -1,6 +1,6 @@
 package com.inhyuk.lango.level.prompt
 
-import com.inhyuk.lango.level.dto.LevelTestAnswer
+import com.inhyuk.lango.level.domain.LevelTestAnswer
 
 class LevelTestEvalGuidePrompt {
     companion object{

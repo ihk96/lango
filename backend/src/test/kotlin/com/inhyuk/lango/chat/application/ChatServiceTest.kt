@@ -1,7 +1,7 @@
 package com.inhyuk.lango.chat.application
 
 
-import com.inhyuk.lango.chat.domain.ChatSession
+import com.inhyuk.lango.chat.domain.ChatSessionEntity
 import com.inhyuk.lango.chat.dto.ScenarioGenerationResponse
 import com.inhyuk.lango.chat.infrastructure.ChatMessageRepository
 import com.inhyuk.lango.chat.infrastructure.ChatSessionRepository
@@ -30,8 +30,8 @@ class ChatServiceTest : BehaviorSpec({
     val objectMapper = mockk<ObjectMapper>()
 
     val chatService = ChatService(
-        userRepository, chatSessionRepository, chatMessageRepository, 
-        promptManager, chatModel, objectMapper
+        userRepository, chatSessionRepository, chatMessageRepository,
+        promptManager, chatModel, objectMapper, userLevelRepository
     )
     
     val feedbackService = FeedbackService(chatModel, promptManager)
@@ -48,7 +48,7 @@ class ChatServiceTest : BehaviorSpec({
             val scenarioResponse = ScenarioGenerationResponse("Scenario", "Waiter", "Hello")
             every { objectMapper.readValue(any<String>(), ScenarioGenerationResponse::class.java) } returns scenarioResponse
 
-            every { chatSessionRepository.save(any()) } answers { spyk(firstArg<ChatSession>()){
+            every { chatSessionRepository.save(any()) } answers { spyk(firstArg<ChatSessionEntity>()){
                 every { id } returns 1L
             } }
             every { chatMessageRepository.save(any()) } returnsArgument 0
