@@ -3,7 +3,7 @@ package com.inhyuk.lango.level.application
 import com.inhyuk.lango.level.dto.AssessmentResponse
 import com.inhyuk.lango.level.infrastructure.UserLevelRepository
 import com.inhyuk.lango.llm.prompt.PromptManager
-import com.inhyuk.lango.user.domain.User
+import com.inhyuk.lango.user.domain.UserEntity
 import com.inhyuk.lango.user.infrastructure.UserRepository
 import dev.langchain4j.model.chat.ChatModel
 import io.kotest.core.spec.style.BehaviorSpec
@@ -23,7 +23,7 @@ class LevelServiceTest : BehaviorSpec({
 
     given("An initial assessment request") {
         val email = "test@example.com"
-        val user = User(email, "pw", "nick")
+        val user = UserEntity(email, "pw", "nick")
         
         `when`("assessing user answers") {
             every { userRepository.findByEmail(email) } returns user

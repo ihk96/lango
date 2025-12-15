@@ -33,7 +33,6 @@ class ChatService(
     private val userRepository: UserRepository,
     private val chatSessionRepository: ChatSessionRepository,
     private val chatMessageRepository: ChatMessageRepository,
-    private val promptManager: PromptManager,
     private val chatModel: ChatModel,
     private val objectMapper: ObjectMapper,
     private val userLevelRepository: UserLevelRepository,
@@ -67,9 +66,9 @@ class ChatService(
                     .description("Scenario generation response")
                     .addStringProperty("scenario","시나리오에 대한 설명...")
                     .addStringProperty("title","시나리오 제목")
-                    .addStringProperty("yourRole","당신의 역할(예: Barista, Ticket Agent, Team Leader)")
+                    .addStringProperty("aiRole","당신의 역할(예: Barista, Ticket Agent, Team Leader)")
                     .addStringProperty("userRole","사용자의 역할(예: Customer, Waiter, Team Member)")
-                    .required("scenario", "yourRole", "userRole", "title")
+                    .required("scenario", "aiRole", "userRole", "title")
                     .build())
                 .build())
             .build()
@@ -86,7 +85,7 @@ class ChatService(
                 userId = it,
                 scenario = scenarioData.scenario,
                 userRole = scenarioData.userRole,
-                aiRole = scenarioData.yourRole,
+                aiRole = scenarioData.aiRole,
                 userLevel = userLevel.level,
                 title = scenarioData.title
             ))
@@ -140,7 +139,7 @@ class ChatService(
     fun chatMessage(userId : String, sessionId: String, userMessageContent: String) : ScenarioChatMessage{
         val session = chatSessionRepository.findById(sessionId)
             .orElseThrow { IllegalArgumentException("Session not found") }
-
+        val level = Levels.findLevel(session.userLevel) ?: throw IllegalArgumentException("Invalid user level")
         // Save User Message
         saveUserMessage(session, userMessageContent)
         
@@ -148,9 +147,6 @@ class ChatService(
         val history = chatMessageRepository.findBySessionIdOrderByCreatedAtAsc(sessionId)
         val lcMessages = mutableListOf<ChatMessage>()
         
-        // Add System Prompt
-        lcMessages.add(SystemMessage(promptManager.getChatSystemPrompt(session.aiRole, session.userLevel, session.userLevel, session.scenario)))
-
         history.map { it->
             when(it.sender) {
                 MessageSender.USER -> UserMessage(it.content)
@@ -158,8 +154,6 @@ class ChatService(
                 else -> {}
             }
         }
-
-        val level = Levels.findLevel(session.userLevel) ?: throw IllegalArgumentException("Invalid user level")
 
         val prompt = ChatPrompt.getChatSystemPrompt(
             aiRole = session.aiRole,

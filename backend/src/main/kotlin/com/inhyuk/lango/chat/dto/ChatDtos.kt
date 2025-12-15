@@ -5,12 +5,12 @@ import com.inhyuk.lango.chat.domain.ChatSessionEntity
 data class ScenarioGenerationResponse(
     val title : String,
     val scenario: String,
-    val yourRole: String,
+    val aiRole: String,
     val userRole: String
 )
 
 data class ChatSessionResponse(
-    val sessionId: String,
+    val sessionId: String?,
     val title: String,
     val scenario: String,
     val userRole: String,
@@ -19,7 +19,7 @@ data class ChatSessionResponse(
     companion object {
         fun from(session: ChatSessionEntity): ChatSessionResponse {
             return ChatSessionResponse(
-                sessionId = session.id!!,
+                sessionId = session.id,
                 scenario = session.scenario,
                 userRole = session.userRole,
                 aiRole = session.aiRole,

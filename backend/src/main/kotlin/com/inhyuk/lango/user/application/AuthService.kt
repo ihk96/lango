@@ -1,6 +1,6 @@
 package com.inhyuk.lango.user.application
 
-import com.inhyuk.lango.user.domain.User
+import com.inhyuk.lango.user.domain.UserEntity
 import com.inhyuk.lango.user.domain.UserRole
 import com.inhyuk.lango.user.dto.LoginRequest
 import com.inhyuk.lango.user.dto.SignupRequest
@@ -26,7 +26,7 @@ class AuthService(
             throw IllegalArgumentException("Email already exists")
         }
         val encodedPw = passwordEncoder.encode(request.password) ?: throw Exception("비밀번호 암호화 실패")
-        val user = User(
+        val user = UserEntity(
             email = request.email,
             password = encodedPw,
             nickname = request.nickname,

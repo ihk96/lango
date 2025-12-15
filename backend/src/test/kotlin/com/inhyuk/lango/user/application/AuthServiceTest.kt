@@ -1,6 +1,6 @@
 package com.inhyuk.lango.user.application
 
-import com.inhyuk.lango.user.domain.User
+import com.inhyuk.lango.user.domain.UserEntity
 import com.inhyuk.lango.user.dto.LoginRequest
 import com.inhyuk.lango.user.dto.SignupRequest
 import com.inhyuk.lango.user.infrastructure.UserRepository
@@ -22,7 +22,7 @@ class AuthServiceTest : BehaviorSpec({
 
     given("A signup request") {
         val request = SignupRequest("test@example.com", "password", "testuser")
-        val user = User("test@example.com", "encodedPw", "testuser")
+        val user = UserEntity("test@example.com", "encodedPw", "testuser")
         val userId = UUID.randomUUID().toString()
 
         `when`("email is already registered") {
@@ -38,7 +38,7 @@ class AuthServiceTest : BehaviorSpec({
         `when`("email is new") {
             every { userRepository.findByEmail(any()) } returns null
             every { passwordEncoder.encode(any()) } returns "encodedPw"
-            every { userRepository.save(any()) } answers { spyk(firstArg<User>()){
+            every { userRepository.save(any()) } answers { spyk(firstArg<UserEntity>()){
                 every { id } returns userId
             } }
 
@@ -58,7 +58,7 @@ class AuthServiceTest : BehaviorSpec({
         val session = MockHttpSession()
 
         `when`("credentials are valid") {
-            val user = User("test@example.com", "encodedPw", "testuser")
+            val user = UserEntity("test@example.com", "encodedPw", "testuser")
             user.id // Mocked entity usually has null ID if not persisted or spyk, but AuthService.login uses ID in response
             // We need to ensure UserResponse.from(user) works. UserResponse needs ID!!.
             // Implementation of UserResponse.from calls user.id!! 
@@ -72,7 +72,7 @@ class AuthServiceTest : BehaviorSpec({
             // We should modify User Entity to allow setting ID for testing or use a constructor that allows it.
             // Or we can mock the `UserResponse.from` or just fix the test setup.
             // Let's use reflection to set the ID field for the test instance.
-            val field = User::class.java.getDeclaredField("id")
+            val field = UserEntity::class.java.getDeclaredField("id")
             field.isAccessible = true
             field.set(user, 1L)
 

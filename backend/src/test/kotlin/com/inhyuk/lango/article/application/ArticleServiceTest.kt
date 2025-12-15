@@ -2,7 +2,7 @@ package com.inhyuk.lango.article.application
 
 import com.inhyuk.lango.article.dto.ArticleResponse
 import com.inhyuk.lango.llm.prompt.PromptManager
-import com.inhyuk.lango.user.domain.User
+import com.inhyuk.lango.user.domain.UserEntity
 import com.inhyuk.lango.user.infrastructure.UserRepository
 import dev.langchain4j.model.chat.ChatModel
 import io.kotest.core.spec.style.BehaviorSpec
@@ -21,7 +21,7 @@ class ArticleServiceTest : BehaviorSpec({
 
     given("An article generation request") {
         val email = "test@example.com"
-        val user = User(email, "pw", "nick")
+        val user = UserEntity(email, "pw", "nick")
         
         `when`("user exists") {
             every { userRepository.findByEmail(email) } returns user
