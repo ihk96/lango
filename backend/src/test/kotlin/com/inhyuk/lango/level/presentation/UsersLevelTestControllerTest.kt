@@ -46,7 +46,7 @@ class UsersLevelTestControllerTest : BehaviorSpec({
             every { levelTestService.generateTestQuestions(any()) } returns Unit
 
             then("200 OK") {
-                mockMvc.perform(post("/api/v1/users/levels/test/generate")
+                mockMvc.perform(post("/api/v1/users/levels/tests/generate")
                     .principal(authentication))
                     .andExpect(status().isOk)
             }
@@ -66,7 +66,7 @@ class UsersLevelTestControllerTest : BehaviorSpec({
             every { levelTestService.getVocaTestsQuestions(any()) } returns items
 
             then("200 OK 와 데이터 배열 반환") {
-                mockMvc.perform(get("/api/v1/users/levels/test/questions/vocabulary").principal(authentication))
+                mockMvc.perform(get("/api/v1/users/levels/tests/questions/vocabulary").principal(authentication))
 
                     .andExpect(status().isOk)
                     .andExpect(jsonPath("$.data[0].question").value("Q1"))
@@ -87,7 +87,7 @@ class UsersLevelTestControllerTest : BehaviorSpec({
             every { levelTestService.getGrammarTestsQuestions(any()) } returns items
 
             then("200 OK") {
-                mockMvc.perform(get("/api/v1/users/levels/test/questions/grammar").principal(authentication))
+                mockMvc.perform(get("/api/v1/users/levels/tests/questions/grammar").principal(authentication))
                     .andExpect(status().isOk)
                     .andExpect(jsonPath("$.data[0].answer").value("A"))
             }
@@ -105,7 +105,7 @@ class UsersLevelTestControllerTest : BehaviorSpec({
             every { levelTestService.getWritingTestsQuestions(any()) } returns items
 
             then("200 OK") {
-                mockMvc.perform(get("/api/v1/users/levels/test/questions/writing").principal(authentication))
+                mockMvc.perform(get("/api/v1/users/levels/tests/questions/writing").principal(authentication))
                     .andExpect(status().isOk)
                     .andExpect(jsonPath("$.data[0].question").value("Write this"))
             }
@@ -125,7 +125,7 @@ class UsersLevelTestControllerTest : BehaviorSpec({
             every { levelTestService.getReadingTestsQuestions(any()) } returns items
 
             then("200 OK") {
-                mockMvc.perform(get("/api/v1/users/levels/test/questions/reading").principal(authentication))
+                mockMvc.perform(get("/api/v1/users/levels/tests/questions/reading").principal(authentication))
                     .andExpect(status().isOk)
                     .andExpect(jsonPath("$.data[0].question").value("Q"))
             }
@@ -139,7 +139,7 @@ class UsersLevelTestControllerTest : BehaviorSpec({
 
             then("200 OK") {
                 mockMvc.perform(
-                    post("/api/v1/users/levels/test/answers/vocabulary")
+                    post("/api/v1/users/levels/tests/answers/vocabulary")
                         .principal(authentication)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req))
@@ -155,7 +155,7 @@ class UsersLevelTestControllerTest : BehaviorSpec({
 
             then("200 OK") {
                 mockMvc.perform(
-                    post("/api/v1/users/levels/test/answers/grammar")
+                    post("/api/v1/users/levels/tests/answers/grammar")
                         .principal(authentication)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req))
@@ -171,7 +171,7 @@ class UsersLevelTestControllerTest : BehaviorSpec({
 
             then("200 OK") {
                 mockMvc.perform(
-                    post("/api/v1/users/levels/test/answers/writing")
+                    post("/api/v1/users/levels/tests/answers/writing")
                         .principal(authentication)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req))
@@ -187,7 +187,7 @@ class UsersLevelTestControllerTest : BehaviorSpec({
 
             then("200 OK") {
                 mockMvc.perform(
-                    post("/api/v1/users/levels/test/answers/reading")
+                    post("/api/v1/users/levels/tests/answers/reading")
                         .principal(authentication)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req))
@@ -205,7 +205,7 @@ class UsersLevelTestControllerTest : BehaviorSpec({
             every { levelService.saveUserLevel(any(), any<CEFRLevel>()) } returns mockk(relaxed = true)
 
             then("200 OK 와 레벨 문자열 반환") {
-                mockMvc.perform(post("/api/v1/users/levels/test/evaluate").principal(authentication))
+                mockMvc.perform(post("/api/v1/users/levels/tests/evaluate").principal(authentication))
                     .andExpect(status().isOk)
                     .andExpect(jsonPath("$.data").value("A1.1"))
             }

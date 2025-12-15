@@ -5,11 +5,11 @@ export interface Message {
 }
 
 export interface ChatSession {
-    sessionId: number;
+    sessionId: string;
     scenario: string;
     userRole: string;
     aiRole: string;
-    initialMessage: string;
+    title: string;
 }
 
 export interface FeedbackResponse {

@@ -22,14 +22,14 @@ data class QuestionResponse(
 data class UsersLevelResponse(
     val id : String,
     val userId: String,
-    val level : CEFRLevel,
+    val level : String,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
 )
 fun UserLevelEntity.toResponse() = UsersLevelResponse(
     id = id!!,
     userId = userId,
-    level = Levels.findLevel(level) ?: throw IllegalStateException(),
+    level = level,
     createdAt = createdAt,
     updatedAt = updatedAt
 )

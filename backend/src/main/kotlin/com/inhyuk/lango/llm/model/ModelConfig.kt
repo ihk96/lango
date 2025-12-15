@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 class ModelConfig(
     @Value("\${llm.api.key}")
-    private val apiKey: String
+    private var apiKey: String=""
 ) {
 
     @Bean
