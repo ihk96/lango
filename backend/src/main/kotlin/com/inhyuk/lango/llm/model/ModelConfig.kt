@@ -6,7 +6,10 @@ import dev.langchain4j.model.googleai.GoogleAiGeminiChatModel
 import dev.langchain4j.model.googleai.GoogleAiGeminiStreamingChatModel
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
+import org.springframework.stereotype.Component
+
 
 @Configuration
 class ModelConfig(
@@ -18,7 +21,8 @@ class ModelConfig(
     fun chatModel(): ChatModel {
         val model = GoogleAiGeminiChatModel.builder()
             .apiKey(apiKey)
-            .modelName("gemini-3-pro-preview")
+            .modelName("gemini-2.5-flash")
+//            .modelName("gemini-3-pro-preview")
             .returnThinking(true)
             .build()
         return model

@@ -32,7 +32,7 @@ class LevelTestGuidePrompt {
                     - 7000+단어 (예: meticulous, ubiquitous, juxtaposition)
                     - 학술/전문 용어
                     
-                    위 예시에 있는 단어 및 문장 그대로를 문제로 출제하지 마세요.
+                    위 예시에 있는 단어 및 문장은 문제로 출제하지 마세요.
                     각 문제는 레벨, 문제 유형, 지문, 정답으로 구성합니다.
                 </Level Test Generation Guideline>
             """.trimIndent()

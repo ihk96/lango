@@ -71,7 +71,7 @@ function Evaluation(){
 
 	async function fetchEvaluation(){
 		const _level = await evaluate().then(res=>res.data)
-		setLevel(_level)
+		setLevel(_level.data)
 		setIsReady(true)
 	}
 
@@ -128,6 +128,16 @@ function WritingTests(props: {
 			}
 		})
 	}
+	async function skipStep(){
+		answerWritingTest({questionId: step, answer: answer}).then(res=>{
+			if(questions.length == step+1){
+				props.onFinish?.()
+			} else {
+				setStep(curr=>curr+1)
+				setAnswer("")
+			}
+		})
+	}
 
 	return (
 		<div>
@@ -147,6 +157,7 @@ function WritingTests(props: {
 						<Textarea onChange={(e)=>setAnswer(e.target.value)} value={answer}/>
 					</div>
 					<Button onClick={nextStep}>다음</Button>
+					<Button variant={"outline"} onClick={skipStep}>모르겠어요</Button>
 				</div>
 			}
 		</div>
@@ -186,6 +197,16 @@ function ReadingTests(props: {
 			}
 		})
 	}
+	async function skipStep(){
+		answerReadingTest({questionId: step, answer: answer}).then(res=>{
+			if(questions.length == step+1){
+				props.onFinish?.()
+			} else {
+				setStep(curr=>curr+1)
+				setAnswer("")
+			}
+		})
+	}
 
 	return (
 		<div>
@@ -207,6 +228,7 @@ function ReadingTests(props: {
 						<Textarea onChange={(e)=>setAnswer(e.target.value)} value={answer}/>
 					</div>
 					<Button onClick={nextStep}>다음</Button>
+					<Button variant={"outline"} onClick={skipStep}>모르겠어요</Button>
 				</div>
 			}
 		</div>
@@ -246,6 +268,16 @@ function GrammarTests(props: {
 			}
 		})
 	}
+	async function skipStep(){
+		answerGrammarTest({questionId: step, answer: answer}).then(res=>{
+			if(questions.length == step+1){
+				props.onFinish?.()
+			} else {
+				setStep(curr=>curr+1)
+				setAnswer("")
+			}
+		})
+	}
 
 	return (
 		<div>
@@ -262,13 +294,14 @@ function GrammarTests(props: {
 					<div>문법 테스트</div>
 					<div>{currentQuestion.passageText}</div>
 					<div className={"flex gap-2"}>
-						<ToggleGroup type="single" onValueChange={(v)=>{setAnswer(v)}}>
+						<ToggleGroup type="single" onValueChange={(v)=>{setAnswer(v)}} value={answer}>
 							{
 								currentQuestion.options.map(option=><ToggleGroupItem value={option}>{option}</ToggleGroupItem>)
 							}
 						</ToggleGroup>
 					</div>
 					<Button onClick={nextStep}>다음</Button>
+					<Button variant={"outline"} onClick={skipStep}>모르겠어요</Button>
 				</div>
 			}
 		</div>
@@ -313,6 +346,16 @@ function VocabularyTests(props: {
 		});
 
 	}
+	async function skipStep(){
+		answerVocabularyTest({questionId: step, answer: answer}).then(res=>{
+			if(questions.length == step+1){
+				props.onFinish?.()
+			} else {
+				setStep(curr=>curr+1)
+				setAnswer("")
+			}
+		})
+	}
 
 	return (
 		<div>
@@ -333,6 +376,7 @@ function VocabularyTests(props: {
 						답안: <Input value={answer} onChange={(e)=>setAnswer(e.target.value)}/>
 					</div>
 					<Button onClick={nextStep}>다음</Button>
+					<Button variant={"outline"} onClick={skipStep}>모르겠어요</Button>
 				</div>
 			}
 		</div>

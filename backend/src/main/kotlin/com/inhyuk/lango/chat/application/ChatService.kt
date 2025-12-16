@@ -66,8 +66,8 @@ class ChatService(
                     .description("Scenario generation response")
                     .addStringProperty("scenario","시나리오에 대한 설명...")
                     .addStringProperty("title","시나리오 제목")
-                    .addStringProperty("aiRole","당신의 역할(예: Barista, Ticket Agent, Team Leader)")
-                    .addStringProperty("userRole","사용자의 역할(예: Customer, Waiter, Team Member)")
+                    .addStringProperty("aiRole","당신의 역할(예: 바리스타, 매표소 직원, 팀장)")
+                    .addStringProperty("userRole","사용자의 역할(예: 고객, 웨이터, 팀원)")
                     .required("scenario", "aiRole", "userRole", "title")
                     .build())
                 .build())
@@ -75,6 +75,7 @@ class ChatService(
 
         val request = ChatRequest.builder()
             .messages(UserMessage(prompt))
+            .temperature(0.8)
             .responseFormat(responseFormat)
             .build()
         val response = chatModel.chat(request)
@@ -122,6 +123,7 @@ class ChatService(
             .build()
         val request = ChatRequest.builder()
             .messages(SystemMessage(prompt))
+            .temperature(0.8)
             .responseFormat(responseFormat)
             .build()
 
@@ -176,6 +178,7 @@ class ChatService(
             .build()
         val request = ChatRequest.builder()
             .messages(SystemMessage(prompt),*lcMessages.toTypedArray())
+            .temperature(0.8)
             .responseFormat(responseFormat)
             .build()
 

@@ -93,7 +93,7 @@ export async function answerWritingTest(question: {questionId: number, answer: s
     return response
 }
 export async function evaluate(request?: Request){
-    let response : AxiosResponse<string>
+    let response : AxiosResponse<APIResponse<string>>
     response = await client.post("/v1/users/levels/tests/evaluate", null, getDefaultOption(request))
     return response
 }

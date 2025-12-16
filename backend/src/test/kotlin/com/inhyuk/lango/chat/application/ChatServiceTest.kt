@@ -1,6 +1,7 @@
 package com.inhyuk.lango.chat.application
 
 
+import com.inhyuk.lango.ModelConfigForTest
 import com.inhyuk.lango.chat.domain.ChatSessionEntity
 import com.inhyuk.lango.chat.domain.ScenarioChatMessage
 import com.inhyuk.lango.chat.dto.ScenarioGenerationResponse
@@ -16,6 +17,7 @@ import dev.langchain4j.model.chat.StreamingChatModel
 import dev.langchain4j.model.chat.request.ChatRequest
 import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.core.spec.style.BehaviorSpec
+import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.mockk.every
 import io.mockk.mockk
@@ -29,6 +31,7 @@ class ChatServiceTest : BehaviorSpec({
     val chatSessionRepository = mockk<ChatSessionRepository>()
     val chatMessageRepository = mockk<ChatMessageRepository>()
     val chatModel = mockk<ChatModel>()
+    val realChatModel = ModelConfigForTest.chatModel
     val objectMapper = mockk<ObjectMapper>()
     val userLevelRepository = mockk<UserLevelRepository>()
 
@@ -95,6 +98,38 @@ class ChatServiceTest : BehaviorSpec({
             }
         }
     }
+
+    given("진짜 채팅 모델을 사용하여 세션 생성"){
+        val realObjectMapper = ObjectMapper()
+        val reaclChatService = ChatService(
+            userRepository, chatSessionRepository, chatMessageRepository,
+            realChatModel, realObjectMapper, userLevelRepository
+        )
+        val userMock = mockk<UserEntity>(relaxed = true)
+        every { userRepository.findById(any<String>()) } returns Optional.of(userMock)
+        every { userLevelRepository.findByUserId(any()) } returns UserLevelEntity(
+            userId = "userId",
+            level = "B2.1"
+        )
+        every { chatSessionRepository.save(any()) } answers { spyk(firstArg<ChatSessionEntity>()){
+            every { id } returns "23"
+        } }
+        every { chatMessageRepository.save(any()) } returnsArgument 0
+
+        `when`("starting a session") {
+            val response = reaclChatService.createSession(email, "커피 주문")
+            then("it should create a session and save initial message") {
+                verify(exactly = 1) { chatSessionRepository.save(any()) }
+                response.shouldNotBeNull()
+                println(response.title)
+                println(response.aiRole)
+                println(response.userRole)
+                println(response.scenario)
+                println(response.userLevel)
+            }
+        }
+    }
+
 
     given("정상적인 세션 시작"){
         every { chatSessionRepository.findById(any()) } returns Optional.of(mockk(relaxed = true){

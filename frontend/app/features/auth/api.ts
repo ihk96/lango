@@ -10,9 +10,9 @@ export async function login(input: LoginInput, request? : Request) {
 }
 
 export async function signup(input: SignupInput, request? : Request) {
-    return client.post<APIResponse<AuthUser>>("/v1/auth/signup", { body: input }, getDefaultOption(request)  );
+    return client.post<APIResponse<AuthUser>>("/v1/auth/signup", input , getDefaultOption(request)  );
 }
 
 export async function logout(request? : Request): Promise<void> {
-    await client.post<null>("/v1/auth/logout", { method: "POST" },getDefaultOption(request));
+    await client.post<null>("/v1/auth/logout", getDefaultOption(request));
 }

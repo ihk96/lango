@@ -120,6 +120,9 @@ export const userLevelHandlers = [
 
     // Evaluate tests → returns plain text level like "A2"
     http.post(api + "/v1/users/levels/tests/evaluate", async () => {
-        return HttpResponse.text("A1.1");
+        return HttpResponse.json({
+	        message: null,
+	        data: "A1.2",
+        });
     }),
 ];

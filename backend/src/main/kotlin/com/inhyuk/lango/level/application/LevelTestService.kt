@@ -86,12 +86,10 @@ class LevelTestService(private val levelTestFactory: LevelTestFactory) {
             answer = answer
         )
 
-        val answers = answerMap[userId]?.let{
-            val newAnswers = LevelTestAnswer()
-            answerMap[userId] = newAnswers
-            newAnswers
+        val answers = answerMap[userId] ?: run {
+            LevelTestAnswer().also { answerMap[userId] = it }
         }
-        answers!!.vocabulary.add(answerEntity)
+        answers.vocabulary.add(answerEntity)
     }
     fun answerGrammarTest(userId: String, idx: Int, answer: String) {
         val testQuestions = questionMap[userId] ?: throw IllegalArgumentException("User has no test questions")
@@ -99,12 +97,10 @@ class LevelTestService(private val levelTestFactory: LevelTestFactory) {
             question = testQuestions.grammar[idx],
             answer = answer
         )
-        val answers = answerMap[userId]?.let{
-            val newAnswers = LevelTestAnswer()
-            answerMap[userId] = newAnswers
-            newAnswers
+        val answers = answerMap[userId] ?: run {
+            LevelTestAnswer().also { answerMap[userId] = it }
         }
-        answers!!.grammar.add(answerEntity)
+        answers.grammar.add(answerEntity)
     }
     fun answerReadingTest(userId: String, idx: Int, answer: String) {
         val testQuestions = questionMap[userId] ?: throw IllegalArgumentException("User has no test questions")
@@ -112,12 +108,10 @@ class LevelTestService(private val levelTestFactory: LevelTestFactory) {
             question = testQuestions.reading[idx],
             answer = answer
         )
-        val answers = answerMap[userId]?.let{
-            val newAnswers = LevelTestAnswer()
-            answerMap[userId] = newAnswers
-            newAnswers
+        val answers = answerMap[userId] ?: run {
+            LevelTestAnswer().also { answerMap[userId] = it }
         }
-        answers!!.reading.add(answerEntity)
+        answers.reading.add(answerEntity)
     }
     fun answerWritingTest(userId: String, idx: Int, answer: String) {
         val testQuestions = questionMap[userId] ?: throw IllegalArgumentException("User has no test questions")
@@ -125,12 +119,10 @@ class LevelTestService(private val levelTestFactory: LevelTestFactory) {
             question = testQuestions.writing[idx],
             answer = answer
         )
-        val answers = answerMap[userId]?.let{
-            val newAnswers = LevelTestAnswer()
-            answerMap[userId] = newAnswers
-            newAnswers
+        val answers = answerMap[userId] ?: run {
+            LevelTestAnswer().also { answerMap[userId] = it }
         }
-        answers!!.writing.add(answerEntity)
+        answers.writing.add(answerEntity)
     }
 
     fun getVocaTestAnswer(userId: String) : List<VocabularyTestAnswer>? {

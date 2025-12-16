@@ -27,4 +27,8 @@ class ChatSessionEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     val id: String? = null
+
+    override fun toString(): String {
+        return "ChatSessionEntity(id=$id, userId='$userId', title='$title', scenario='$scenario', userRole='$userRole', aiRole='$aiRole', userLevel='$userLevel', createdAt=$createdAt)"
+    }
 }
