@@ -1,6 +1,7 @@
 package com.inhyuk.lango.chat.dto
 
 import com.inhyuk.lango.chat.domain.ChatSessionEntity
+import com.inhyuk.lango.chat.domain.MessageSender
 
 data class ScenarioGenerationResponse(
     val title : String,
@@ -35,5 +36,6 @@ data class ChatMessageRequest(
 
 data class ChatMessageResponse(
     val content: String,
-    val subContent : String?
+    val subContent : String?,
+    val sender: MessageSender
 )

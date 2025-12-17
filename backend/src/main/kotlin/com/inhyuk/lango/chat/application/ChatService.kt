@@ -46,7 +46,7 @@ class ChatService(
         return chatSessionRepository.findById(sessionId).orElseThrow { IllegalArgumentException("Session not found") }
     }
 
-    fun getChatHistory(sessionId: String): List<ChatMessageEntity> {
+    fun getChatMessages(sessionId: String): List<ChatMessageEntity> {
         return chatMessageRepository.findBySessionIdOrderByCreatedAtAsc(sessionId)
     }
 
@@ -117,12 +117,12 @@ class ChatService(
                     .addStringProperty("message","롤플레이 응답문 (영문)")
                     .addStringProperty("translate","응답문의 번역 (한글)")
                     .addStringProperty("code","응답에 대한 구분값 입니다. 사용자가 시나리오와 안맞는 대화를 하거나 부적절한 대화나 요청을 하면 '-1', 정상적인 대화인 경우 '0'을 입력")
-                    .required("content", "translate", "code")
+                    .required("message", "translate", "code")
                     .build())
                 .build())
             .build()
         val request = ChatRequest.builder()
-            .messages(SystemMessage(prompt))
+            .messages(UserMessage(prompt))
             .temperature(0.8)
             .responseFormat(responseFormat)
             .build()
@@ -147,13 +147,11 @@ class ChatService(
         
         // Build Context
         val history = chatMessageRepository.findBySessionIdOrderByCreatedAtAsc(sessionId)
-        val lcMessages = mutableListOf<ChatMessage>()
-        
-        history.map { it->
+        val lcMessages = history.map {
             when(it.sender) {
                 MessageSender.USER -> UserMessage(it.content)
                 MessageSender.AI -> AiMessage(it.content)
-                else -> {}
+                else -> null
             }
         }
 
@@ -172,7 +170,7 @@ class ChatService(
                     .addStringProperty("message","롤플레이 응답문 (영문)")
                     .addStringProperty("translate","응답문의 번역 (한글)")
                     .addStringProperty("code","응답에 대한 구분값 입니다. 사용자가 시나리오와 안맞는 대화를 하거나 부적절한 대화나 요청을 하면 '-1', 정상적인 대화인 경우 '0'을 입력")
-                    .required("content", "translate", "code")
+                    .required("message", "translate", "code")
                     .build())
                 .build())
             .build()

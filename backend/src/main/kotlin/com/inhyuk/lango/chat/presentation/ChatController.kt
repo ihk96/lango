@@ -1,6 +1,7 @@
 package com.inhyuk.lango.chat.presentation
 
 import com.inhyuk.lango.chat.application.ChatService
+import com.inhyuk.lango.chat.domain.MessageSender
 import com.inhyuk.lango.chat.dto.ChatMessageRequest
 import com.inhyuk.lango.chat.dto.ChatMessageResponse
 import com.inhyuk.lango.chat.dto.ChatSessionResponse
@@ -30,17 +31,19 @@ class ChatController(
         return ResponseEntity.ok(ApiResponse(data = sessions.map { ChatSessionResponse.from(it) }))
     }
 
+    @GetMapping("/sessions/{sessionId}/messages")
+    fun getSessionHistory(@PathVariable sessionId: String): ResponseEntity<ApiResponse<List<ChatMessageResponse>>> {
+        val history = chatService.getChatMessages(sessionId)
+        return ResponseEntity.ok(ApiResponse(data = history.map { ChatMessageResponse(content = it.content, subContent = it.subContent, sender = it.sender) }))
+    }
+
     @GetMapping("/sessions/{sessionId}")
     fun getSession(@PathVariable sessionId: String): ResponseEntity<ApiResponse<ChatSessionResponse>> {
         val session = chatService.getChatSession(sessionId) ?: return ResponseEntity.notFound().build()
         return ResponseEntity.ok(ApiResponse(ChatSessionResponse.from(session)))
     }
 
-    @GetMapping("/sessions/{sessionId}/history")
-    fun getSessionHistory(@PathVariable sessionId: String): ResponseEntity<ApiResponse<List<ChatMessageResponse>>> {
-        val history = chatService.getChatHistory(sessionId)
-        return ResponseEntity.ok(ApiResponse(data = history.map { ChatMessageResponse(content = it.content, subContent = it.subContent) }))
-    }
+
 
     @PostMapping("/sessions")
     fun createSession(
@@ -55,7 +58,7 @@ class ChatController(
     @PostMapping("/sessions/{sessionId}/start")
     fun startSession(@PathVariable sessionId: String): ResponseEntity<ApiResponse<ChatMessageResponse>> {
         val message = chatService.startSessionChat(sessionId)
-        return ResponseEntity.ok(ApiResponse(ChatMessageResponse(content = message.message, subContent = message.translate)))
+        return ResponseEntity.ok(ApiResponse(ChatMessageResponse(content = message.message, subContent = message.translate, sender = MessageSender.AI)))
     }
 
     @PostMapping("/sessions/{sessionId}/messages")
@@ -66,6 +69,6 @@ class ChatController(
     ): ResponseEntity<ApiResponse<ChatMessageResponse>> {
         val userId = authentication.principal as? String ?: return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
         val message = chatService.chatMessage(userId, sessionId, request.content)
-        return ResponseEntity.ok(ApiResponse(ChatMessageResponse(content = message.message, subContent = message.translate)))
+        return ResponseEntity.ok(ApiResponse(ChatMessageResponse(content = message.message, subContent = message.translate, sender = MessageSender.AI)))
     }
 }

@@ -23,8 +23,28 @@ export async function startSession(sessionId: string, request? : Request){
 const ChatMessageResponse = z.object({
     content: z.string(),
     subContent: z.string(),
+    sender: z.enum(["USER","AI"]),
 })
 
 export async function sendMessage(sessionId: string, message: string, request? : Request){
     return client.post<APIResponse<z.infer<typeof ChatMessageResponse>>>("/v1/chat/sessions/"+sessionId+"/messages", {content: message}, getDefaultOption(request));
+}
+
+const ChatSessionResponse = z.object({
+    sessionId: z.string(),
+    title: z.string(),
+    scenario: z.string(),
+    userRole: z.string(),
+    aiRole: z.string(),
+})
+export async function getSession(sessionId: string, request? : Request){
+    return client.get<APIResponse<z.infer<typeof ChatSessionResponse>>>("/v1/chat/sessions/"+sessionId, getDefaultOption(request));
+}
+
+export async function getSessions(request? : Request){
+    return client.get<APIResponse<z.infer<typeof ChatSessionResponse>[]>>("/v1/chat/sessions", getDefaultOption(request));
+}
+
+export async function getSessionMessages(sessionId: string, request? : Request){
+    return client.get<APIResponse<z.infer<typeof ChatMessageResponse>[]>>("/v1/chat/sessions/"+sessionId+"/messages", getDefaultOption(request));
 }

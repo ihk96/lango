@@ -1,5 +1,12 @@
-import process from "node:process";
 
 export function getHost(){
-	return "http://localhost:8080";
+	try {
+		if(window){
+
+		}
+		return import.meta.env.VITE_API_SERVER;
+	} catch {
+		return process.env.API_SERVER
+	}
+
 }

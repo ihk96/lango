@@ -1,7 +1,7 @@
-export interface Message {
-    id?: string; // transient id for UI
-    role: 'user' | 'assistant';
-    content: string;
+export type ChatMessage = {
+    content: string,
+    subContent?: string,
+    sender: "AI" | "USER"
 }
 
 export interface ChatSession {

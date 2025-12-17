@@ -16,9 +16,9 @@ enableMocking().then(() => {
     startTransition(() => {
         hydrateRoot(
             document,
-            <StrictMode>
+            // <StrictMode>
                 <HydratedRouter/>
-            </StrictMode>,
+            // </StrictMode>,
         );
     });
 })
